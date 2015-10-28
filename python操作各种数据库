@@ -1,0 +1,180 @@
+###########################################################
+目录：
+	0.简介
+	1.mysql数据库
+###########################################################
+0.简介
+Python 标准数据库接口为 Python DB-API，Python DB-API为开发人员提供了数据库应用编程接口。
+
+Python 数据库接口支持非常多的数据库，你可以选择适合你项目的数据库：
+
+    GadFly
+    mSQL
+    MySQL
+    PostgreSQL
+    Microsoft SQL Server 2000
+    Informix
+    Interbase
+    Oracle
+    Sybase
+
+你可以访问Python数据库接口及API查看详细的支持数据库列表。		Python数据库接口及API：https://wiki.python.org/moin/DatabaseInterfaces
+不同的数据库你需要下载不同的DB API模块，例如你需要访问Oracle数据库和Mysql数据，你需要下载Oracle和MySQL数据库模块。
+DB-API 是一个规范. 它定义了一系列必须的对象和数据库存取方式, 以便为各种各样的底层数据库系统和多种多样的数据库接口程序提供一致的访问接口 。
+Python的DB-API，为大多数的数据库实现了接口，使用它连接各数据库后，就可以用相同的方式操作各数据库。
+
+Python DB-API使用流程：
+
+    引入 API 模块。
+    获取与数据库的连接。
+    执行SQL语句和存储过程。
+    关闭数据库连接。
+###########################################################
+一.mysql数据库（下面使用mysqldb这个数据库接口）
+1.什么是MySQLdb
+	MySQLdb 是用于Python链接Mysql数据库的接口的一种
+	常见的Python 操作mysql包有  MySQLdb、SQLAlchemy（没有用过）等等、还有一个是mysql.connector（有msyql官方提供的mysql连接器）,
+	而MySQLdb只是其中的一种，下面讲的是mysqldb
+----------------------------------------------------------------------
+补充：
+	你也可以使用mysql.connector  
+	官方给出了 MySQL Connector/Python Developer Guide手册：  地址：http://dev.mysql.com/doc/connector-python/en/
+	Table of Contents     
+		Preface and Legal Notices
+		1 Introduction to MySQL Connector/Python
+		2 Guidelines for Python Developers
+		3 Connector/Python Versions
+		4 Connector/Python Installation     
+		5 Connector/Python Coding Examples     
+		6 Connector/Python Tutorials     
+		7 Connector/Python Connection Establishment     
+		8 The Connector/Python C Extension     
+		9 Connector/Python Other Topics     
+		10 Connector/Python API Reference     
+		11 Connector/Python C Extension API Reference       
+----------------------------------------------------------------------
+2.安装MySQLdb	apt-get install python-dev libmysqlclient-dev pip install MySQL-python
+（1）源码安装 
+	先从https://pypi.python.org/pypi/MySQL-python下载源码包
+		$ gunzip MySQL-python-1.2.2.tar.gz
+		$ tar -xvf MySQL-python-1.2.2.tar
+		$ cd MySQL-python-1.2.2
+		$ python setup.py build
+		$ python setup.py install
+	注意：使用python setup.py build可能出现下面错误
+		-----------------------------------------------------------------------------------------------
+		错误：	yeqing@www:~/桌面/MySQL-python-1.2.5$ python setup.py build
+				sh: 1: mysql_config: not found
+				Traceback (most recent call last):
+				  File "setup.py", line 17, in <module>
+					metadata, options = get_config()
+				  File "/home/yeqing/桌面/MySQL-python-1.2.5/setup_posix.py", line 43, in get_config
+					libs = mysql_config("libs_r")
+				  File "/home/yeqing/桌面/MySQL-python-1.2.5/setup_posix.py", line 25, in mysql_config
+					raise EnvironmentError("%s not found" % (mysql_config.path,))
+				EnvironmentError: mysql_config not found
+		----------------------------------------------------------------------------------------------
+		原因：可能是缺少必要开发的库文件
+		解决办法：apt-get install python-dev libmysqlclient-dev
+		-----------------------------------------------------------------------------------------------
+（2）直接使用命令安装
+		sudo apt-get install python-mysqldb
+----------------------------------------------------------------------
+3.使用测试是否安装上：
+没安装上：
+	>>> import MySQLdb
+	>>>	Traceback (most recent call last):
+		  File "test.py", line 3, in <module>
+			import MySQLdb
+		ImportError: No module named MySQLdb
+	出现上面情况代表没有安装上 MySQLdb 模块
+安装上：
+	>>> import MySQLdb
+	>>>
+	出现上面情况代表安装上 MySQLdb 模块
+----------------------------------------------------------------------
+4.使用数据库
+	连接数据库前，请先确认已经在某个服务器建立了一个数据库
+（1）实例：
+		----------------------------------------------
+		#coding=utf-8
+		import MySQLdb
+		# 打开数据库连接
+		connnect_db= MySQLdb.connect
+									(
+										host='localhost',
+										port = 3306,
+										user='root',
+										passwd='123456',
+										db ='test',
+									)
+		或者使用这种方式
+			# 打开数据库连接
+			connnect_db = MySQLdb.connect("localhost","testuser","test123","TESTDB" )  注意参数顺序
+		# 使用cursor()方法获取操作游标
+		cursor = connnect_db.cursor()
+		----------------------------------------------
+		# 创建数据表SQL语句
+		sql = """CREATE TABLE EMPLOYEE (
+				 FIRST_NAME  CHAR(20) NOT NULL,
+				 LAST_NAME  CHAR(20),
+				 AGE INT,  
+				 SEX CHAR(1),
+				 INCOME FLOAT )"""
+		# 使用execute方法执行SQL语句
+		cursor.execute(sql)
+		----------------------------------------------
+		# SQL 插入语句
+			sql = """INSERT INTO EMPLOYEE(FIRST_NAME,
+					 LAST_NAME, AGE, SEX, INCOME)
+					 VALUES ('Mac', 'Mohan', 20, 'M', 2000)"""
+		# 执行sql语句
+			cursor.execute(sql)
+		# 提交到数据库执行
+			db.commit()
+		----------------------------------------------
+		# SQL 查询语句
+		sql = "SELECT * FROM EMPLOYEE \
+			   WHERE INCOME > '%d'" % (1000)
+		   # 执行SQL语句
+		   cursor.execute(sql)
+		   # 获取所有记录列表
+		   results = cursor.fetchall()
+		   for row in results:
+			  fname = row[0]
+			  lname = row[1]
+			  age = row[2]
+			  sex = row[3]
+			  income = row[4]
+			  # 打印结果
+			  print "fname=%s,lname=%s,age=%d,sex=%s,income=%d" % \
+				     (fname, lname, age, sex, income )
+		----------------------------------------------
+		#关闭游标
+		cursor.close()
+		# 关闭数据库连接
+		db.close()
+		----------------------------------------------
+		直接插入sql语句：
+			#创建数据表
+			#cursor.execute("create table student(id int ,name varchar(20),class varchar(30),age varchar(10))")
+		----------------------------------------------
+（2）总结
+步骤：
+	1.# 打开数据库连接
+	2.# 使用cursor()方法获取操作游标
+	3.各种数据库操作语言
+		创建数据库表
+		数据库插入操作
+		数据库查询操作
+		数据库更新操作
+	4.# 关闭数据库连接
+常用语法：
+	connect() 	方法用于创建数据库的连接，里面可以指定参数：用户名，密码，主机等信息。
+	cursor()	通过获取到的数据库连接connect下的cursor()方法来创建游标。
+	close() 	关闭游标或者关闭数据库连接
+	execute()	通过execute()方法中写如sql语句来对数据进行操作
+	commit()	提交数据，在向数据库插入一条数据时必须要有这个方法，否则数据不会被真正的插入
+	fetchone()  该方法获取下一个查询结果集。结果集是一个对象
+	fetchall()  接收全部的返回结果行.
+	
