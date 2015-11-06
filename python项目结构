@@ -1,0 +1,318 @@
+新手建python项目结构
+下面这个实例是翻译http://pymbook.readthedocs.org/en/latest/index.html 中的一章,第一次翻译，有点不准确。
+有些地方做了一些修改
+
+标题：A project structure : python 项目结构
+
+这篇文章讲了一个完整的python项目结构，讲述了怎样布局你的路径和发布一个软件
+
+1.给我们的项目实例取名： factorial，然后添加一个README.rst文件
+
+	$ mkdir factorial
+	$ cd factorial/
+	$ touch README.rst 
+
+2.给python模块取名： myfact
+	$ mkdir myfact
+
+3.创建文件：	fact.py 和 __init__.py
+
+3.1创建主要代码文件：fact.py
+
+$ cd myfact
+$vim fact.py
+
+fact.py
+------------------------------------------------------------------------------
+"myfact module"
+
+def factorial(num):
+    """
+    Returns the factorial value of the given number.
+
+    :arg num: Interger value of whose factorial we will calculate.
+
+    :return: The value of the the factorial or -1 in case negative value passed.
+    """
+    if num >= 0:
+        if num == 0:
+            return 1
+        return num * factorial(num -1)
+    else:
+        return -1
+---------------------------------------------------------------------------------
+3.2再创建一个__init__.py模块文件
+
+__init__.py
+------------------------------------------
+from fact import factorial
+__all__ = [factorial, ]
+------------------------------------------
+
+现在的目录结构如下：
+
+$ ls
+myfact  README.rst
+$ ls myfact/
+fact.py  __init__.py
+
+
+4.创建一个清单文件：MANIFEST.in
+在我们使用 sdist 命令时，这个清单文件将找出该项目中所有的文件，
+
+MANIFEST.in
+
+include *.py
+include README.rst
+
+5.Installing python-setuptools package
+$ pip install setuptools
+
+6.最后我们创建一个setup.py文件，目的是用来创建一个源码压缩包或者安装软件
+
+setup.py
+
+#!/usr/bin/env python
+"""Factorial project"""
+from setuptools import find_packages, setup
+
+setup(name = 'factorial',
+    version = '0.1',
+    description = "Factorial module.",
+    long_description = "A test module for our book.",
+    platforms = ["Linux"],
+    author="Kushal Das",
+    author_email="kushaldas@gmail.com",
+    url="http://pymbook.readthedocs.org/en/latest/",
+    license = "MIT",
+    packages=find_packages()
+    )
+name 是项目的名称, version是发布版本.至于description 和 long_description你应该很容易理解了. platforms是
+一个这个模块可以工作的平台列表. find_packages 是一个特殊的函数.可以找出你的源代码路径中的所有模块。
+
+Note：
+想要了解更详细的可以查看 packaging docs：https://packaging.python.org/en/latest/distributing/
+
+7.使用setup.py
+执行以下命令：
+yeqing@www:~/pythontest/factorial$ python setup.py sdist
+running sdist
+running egg_info
+creating factorial.egg-info
+writing factorial.egg-info/PKG-INFO
+writing top-level names to factorial.egg-info/top_level.txt
+writing dependency_links to factorial.egg-info/dependency_links.txt
+writing factorial.egg-info/PKG-INFO
+writing top-level names to factorial.egg-info/top_level.txt
+writing dependency_links to factorial.egg-info/dependency_links.txt
+writing manifest file 'factorial.egg-info/SOURCES.txt'
+reading manifest file 'factorial.egg-info/SOURCES.txt'
+reading manifest template 'MANIFEST.in'
+writing manifest file 'factorial.egg-info/SOURCES.txt'
+running check
+creating factorial-0.1
+creating factorial-0.1/factorial.egg-info
+creating factorial-0.1/myfact
+making hard links in factorial-0.1...
+hard linking MANIFEST.in -> factorial-0.1
+hard linking README.rst -> factorial-0.1
+hard linking setup.py -> factorial-0.1
+hard linking factorial.egg-info/PKG-INFO -> factorial-0.1/factorial.egg-info
+hard linking factorial.egg-info/SOURCES.txt -> factorial-0.1/factorial.egg-info
+hard linking factorial.egg-info/dependency_links.txt -> factorial-0.1/factorial.egg-info
+hard linking factorial.egg-info/top_level.txt -> factorial-0.1/factorial.egg-info
+hard linking myfact/__init__.py -> factorial-0.1/myfact
+hard linking myfact/fact.py -> factorial-0.1/myfact
+Writing factorial-0.1/setup.cfg
+creating dist
+Creating tar archive
+removing 'factorial-0.1' (and everything under it)
+在list路径下你能够看见一个压缩包
+$ ls dist/
+factorial-0.1.tar.gz
+
+8.Python包索引
+
+你还记得我们一直使用的pip命令吗？你有没有想过这些安装包从哪来？答案就是PyPi。它是python的软件库。
+在我们的例子中，将使用PyPi的 https://testpypi.python.org/pypi这个测试服务器。
+
+8.1创建账户
+
+首先到这个https://testpypi.python.org/注册一个账户，接着你将收到一封带有链接的电子邮件，点击链接进行确认。
+接着在你的家目录下创建一个.pypirc文件，文件内容如下：
+[distutils]
+index-servers =
+    pypi
+
+[pypi]
+repository: https://testpypi.python.org/pypi
+username: <username>
+password: <password>
+
+8.2注册你的项目
+
+接下来我们将向PyPi服务器注册我们的项目，我们使用下面的命令完成，我们使用 -r 指向服务器。
+$ python setup.py register -r https://testpypi.python.org/pypi
+running register
+running egg_info
+writing factorial.egg-info/PKG-INFO
+writing top-level names to factorial.egg-info/top_level.txt
+writing dependency_links to factorial.egg-info/dependency_links.txt
+reading manifest file 'factorial.egg-info/SOURCES.txt'
+reading manifest template 'MANIFEST.in'
+writing manifest file 'factorial.egg-info/SOURCES.txt'
+running check
+Registering factorial to https://testpypi.python.org/pypi
+Server response (200): OK
+
+8.3上传你的项目
+
+最后我们将使用upload上传我们的项目到PyPi服务器，记住这个命令需要立即调用当你编译了二进制文件之后。
+$ python setup.py sdist upload -r https://testpypi.python.org/pypi
+running sdist
+running egg_info
+writing factorial.egg-info/PKG-INFO
+writing top-level names to factorial.egg-info/top_level.txt
+writing dependency_links to factorial.egg-info/dependency_links.txt
+reading manifest file 'factorial.egg-info/SOURCES.txt'
+reading manifest template 'MANIFEST.in'
+writing manifest file 'factorial.egg-info/SOURCES.txt'
+running check
+creating factorial-0.1
+creating factorial-0.1/factorial.egg-info
+creating factorial-0.1/myfact
+making hard links in factorial-0.1...
+hard linking MANIFEST.in -> factorial-0.1
+hard linking README.rst -> factorial-0.1
+hard linking setup.py -> factorial-0.1
+hard linking factorial.egg-info/PKG-INFO -> factorial-0.1/factorial.egg-info
+hard linking factorial.egg-info/SOURCES.txt -> factorial-0.1/factorial.egg-info
+hard linking factorial.egg-info/dependency_links.txt -> factorial-0.1/factorial.egg-info
+hard linking factorial.egg-info/top_level.txt -> factorial-0.1/factorial.egg-info
+hard linking myfact/__init__.py -> factorial-0.1/myfact
+hard linking myfact/fact.py -> factorial-0.1/myfact
+Writing factorial-0.1/setup.cfg
+Creating tar archive
+removing 'factorial-0.1' (and everything under it)
+running upload
+Submitting dist/factorial-0.1.tar.gz to https://testpypi.python.org/pypi
+Server response (200): OK
+-----------------------------------------------------------------------------------------------
+补充：我自己在包索引这一块出现了问题
+
+yeqing@www:~/pythontest/factorial$ python setup.py register
+running register
+running egg_info
+writing factorialexample.egg-info/PKG-INFO
+writing top-level names to factorialexample.egg-info/top_level.txt
+writing dependency_links to factorialexample.egg-info/dependency_links.txt
+writing factorialexample.egg-info/PKG-INFO
+writing top-level names to factorialexample.egg-info/top_level.txt
+writing dependency_links to factorialexample.egg-info/dependency_links.txt
+reading manifest file 'factorialexample.egg-info/SOURCES.txt'
+reading manifest template 'MANIFEST.in'
+writing manifest file 'factorialexample.egg-info/SOURCES.txt'
+running check
+Registering factorialexample to https://pypi.python.org/pypi
+Server response (401): basic auth faile
+
+解决办法：
+将先前创建的.pypirc文件直接删除，再一次使用python setup.py register命令：
+
+yeqing@www:~/pythontest/factorial$ python setup.py register 
+running register
+running egg_info
+writing factorialexample.egg-info/PKG-INFO
+writing top-level names to factorialexample.egg-info/top_level.txt
+writing dependency_links to factorialexample.egg-info/dependency_links.txt
+writing factorialexample.egg-info/PKG-INFO
+writing top-level names to factorialexample.egg-info/top_level.txt
+writing dependency_links to factorialexample.egg-info/dependency_links.txt
+reading manifest file 'factorialexample.egg-info/SOURCES.txt'
+reading manifest template 'MANIFEST.in'
+writing manifest file 'factorialexample.egg-info/SOURCES.txt'
+running check
+We need to know who you are, so please choose either:
+ 1. use your existing login,
+ 2. register as a new user,
+ 3. have the server generate a new password for you (and email it to you), or
+ 4. quit
+Your selection [default 1]: 
+2
+Username: yezhi
+Password: 
+ Confirm: 
+   EMail: 760832997@qq.com
+Registering yezhi to https://pypi.python.org/pypi
+You will receive an email shortly.
+Follow the instructions in it to complete registration.
+
+接着到你的邮箱确认注册，
+
+yeqing@www:~/pythontest/factorial$ python setup.py register 
+running register
+running egg_info
+writing factorialexample.egg-info/PKG-INFO
+writing top-level names to factorialexample.egg-info/top_level.txt
+writing dependency_links to factorialexample.egg-info/dependency_links.txt
+writing factorialexample.egg-info/PKG-INFO
+writing top-level names to factorialexample.egg-info/top_level.txt
+writing dependency_links to factorialexample.egg-info/dependency_links.txt
+reading manifest file 'factorialexample.egg-info/SOURCES.txt'
+reading manifest template 'MANIFEST.in'
+writing manifest file 'factorialexample.egg-info/SOURCES.txt'
+running check
+We need to know who you are, so please choose either:
+ 1. use your existing login,
+ 2. register as a new user,
+ 3. have the server generate a new password for you (and email it to you), or
+ 4. quit
+Your selection [default 1]: 
+
+Username: yezhi
+Password: 
+Registering factorialexample to https://pypi.python.org/pypi
+Server response (200): OK    <--------------显示注册成功
+I can store your PyPI login so future submissions will be faster.
+(the login will be stored in /home/yeqing/.pypirc)
+Save your login (y/N)?y
+
+最后上传项目：
+yeqing@www:~/pythontest/factorial$ python setup.py sdist upload
+running sdist
+running egg_info
+writing factorialexample.egg-info/PKG-INFO
+writing top-level names to factorialexample.egg-info/top_level.txt
+writing dependency_links to factorialexample.egg-info/dependency_links.txt
+writing factorialexample.egg-info/PKG-INFO
+writing top-level names to factorialexample.egg-info/top_level.txt
+writing dependency_links to factorialexample.egg-info/dependency_links.txt
+reading manifest file 'factorialexample.egg-info/SOURCES.txt'
+reading manifest template 'MANIFEST.in'
+writing manifest file 'factorialexample.egg-info/SOURCES.txt'
+running check
+creating factorialexample-1.0.0
+creating factorialexample-1.0.0/factorialexample.egg-info
+creating factorialexample-1.0.0/myfact
+making hard links in factorialexample-1.0.0...
+hard linking MANIFEST.in -> factorialexample-1.0.0
+hard linking README.rst -> factorialexample-1.0.0
+hard linking setup.py -> factorialexample-1.0.0
+hard linking factorialexample.egg-info/PKG-INFO -> factorialexample-1.0.0/factorialexample.egg-info
+hard linking factorialexample.egg-info/SOURCES.txt -> factorialexample-1.0.0/factorialexample.egg-info
+hard linking factorialexample.egg-info/dependency_links.txt -> factorialexample-1.0.0/factorialexample.egg-info
+hard linking factorialexample.egg-info/top_level.txt -> factorialexample-1.0.0/factorialexample.egg-info
+hard linking myfact/__init__.py -> factorialexample-1.0.0/myfact
+hard linking myfact/fact.py -> factorialexample-1.0.0/myfact
+Writing factorialexample-1.0.0/setup.cfg
+Creating tar archive
+removing 'factorialexample-1.0.0' (and everything under it)
+running upload
+Submitting dist/factorialexample-1.0.0.tar.gz to https://pypi.python.org/pypi
+Server response (200): OK  <----显示上传成功
+
+现在到https://packaging.python.org/ 搜索你自己的项目就能搜到了，现在你可以将它下载到本地。
+
+--------------------------------------------------------------------------------------------------
+上面只是简单的介绍了一个项目的结构，你想完整正规的建造一个项目时，可以参考：
+Python Packaging User Guide：https://packaging.python.org/en/latest/
