@@ -1,0 +1,179 @@
+---------------------------------------------------
+参考：python硬件编程实战
+---------------------------------------------------
+1.对python的四种定义
+	一种脚本语言
+
+	  编译型语言与脚本型与的对比
+		(1)编译型语言
+			简单的说，编译型语言就是用该语言的编译器将源代码编译成目标文件，然后把目标文件加上库文件，最后编译成可执行文件。
+
+		(2)脚本语言
+			脚本语言是无需用编译器编译源代码，可直接运行该源码形式的脚本文件的语言。而直接能够运行的背后，是当前的环境中存在此脚本的解析器，
+			解析器负责读入此脚本的源码，以及后续解析并执行的动作。
+
+	一种解释型语言
+		什么是解释型语言？
+			通俗的讲就是解析器读一行，解释一行，执行一行，所以脚本语言也常被称为解释型语言
+
+	一种高级语言
+		高级语言和低级语言的对比
+			高级语言在本身的设计层面会考虑到对计算机细节的封装和抽象。
+			低级语言像汇编语言，和底层硬件有关系，比如不同的cpu会有不同的指令集和寄存器等各种内部资源。所以每个程序员需要对当前使用的cpu的
+			所有架构。内部资源和细节都非常清楚，同时对当前的特定的cpu的指令的语法都很清楚，因此比较难学习和掌握。
+
+	一直面向对象的语言
+---------------------------------------------------
+
+2.python应用
+
+ 2.1python能干什么
+	基本上能干所有你能想到的事情
+	
+ 2.2你能用python干什么
+    不是每个人都能用python实现如此多的应用，因为许多应用需要许多的软件背景知识，甚至需要一些头脑。
+
+	例如：将python用于3D图形开发，它的难度不在于写python代码，而在于要懂得相关的实现3D效果所涉及的算法。既如何实现对应3D图形背后所涉及的原理和机制，只有搞懂如何实现，才能用代码写出来
+
+	还有就是实现网络爬虫的例子。从网页中抓取数据，模拟网页登入等内容，他们背后涉及的相关的背景知识包括但不限于HTTP的GET和POST操作，cookie，
+json，字符编码，HTML，JavaScript,python中专门解析html的库BeautifulSoup等。只有搞清楚了这些背景知识和相关技术，分析了所要处理的网页的内部执行逻辑，然后是用某种语言模拟实现这套逻辑。
+	
+	可以这么说，实现网络爬虫功能，80%用于搞懂背景知识，20%用于写python代码。
+
+	所以以后自己想要实现某个功能是，一定得弄清楚自己需要那些背景知识，这非常重要。弄明白了你就有方向了。
+
+---------------------------------------------------
+3.python文件开头的申明
+
+	#!/usr/bin/python
+    # _*_ coding:utf-8 _*_ 或者 #coding=utf-8
+---------------------------------------------------
+
+4.python中__name__ 和 __main__的含义
+
+if __name__ == "__main__":
+	main()
+
+__name__ 
+
+如果__name__ 放在moudle中，就表示模块的名字
+如果在类中，就表示类的名字
+
+__main__
+
+如果当前python文件被当做模块调用时，此时__name__就是当前python脚本对应的模块名，就不是__main__,因此就不去执行main()函数
+如果当前python文件被当成普通文件执行时，此时 __name__ 就是 __main__ ,所以此时就去执行main()函数
+---------------------------------------------------
+
+5.self 和 __init__,以及变量作用域
+
+
+self 和 __init__
+
+--------------------------------------------
+实例0：
+	name="global name"/****注意*****/
+
+	class Person:
+	  
+	  def __init__(self,newPersonName):
+		name=newPersonName/****注意*****/
+	  
+	  def sayYourName(self):
+		print self.name
+		print name
+
+	def selfAndInitDemo():
+	  personInstance=Person("yeqing")
+	  personInstance.sayYourName()
+
+	if __name__ == "__main__":
+	  selfAndInitDemo()
+
+结果：出现错误
+
+实例1：
+	name="global name"/****注意*****/
+
+	class Person:
+	  def __init__(self,newPersonName):
+		self.name=newPersonName/****注意*****/
+	  
+	  def sayYourName(self):
+		print self.name
+		print name
+
+	def selfAndInitDemo():
+	  personInstance=Person("yeqing")
+	  personInstance.sayYourName()
+
+	if __name__ == "__main__":
+	  selfAndInitDemo()
+结果：
+	yeqing
+	global name
+
+-------------------------------------------------------
+self指的是个object对象，是当前类的实例
+self.name指的就是实例的名字
+
+由于在类的初始化（实例化）的__init__函数中没有给self.name设置值而使得实例中没有name这个变量，所以后续访问出现错误。
+-------------------------------------------------------
+变量作用域
+实例2：
+	name="global name"/****注意*****/
+
+	class Person:
+	  name="class global name"/****注意*****/
+	  
+	  def __init__(self,newPersonName):
+		name=newPersonName/****注意*****/
+	  
+	  def sayYourName(self):
+		print self.name
+		print name
+
+	def selfAndInitDemo():
+	  personInstance=Person("yeqing")
+	  personInstance.sayYourName()
+
+	if __name__ == "__main__":
+	  selfAndInitDemo()
+
+结果：
+	class global name
+	global name
+
+
+实例3：
+	name="global name"/****注意*****/
+
+	class Person:
+	  name="class global name"/****注意*****/
+	  
+	  def __init__(self,newPersonName):
+		self.name=newPersonName/****注意*****/
+	  
+	  def sayYourName(self):
+		print self.name
+		print name
+
+	def selfAndInitDemo():
+	  personInstance=Person("yeqing")
+	  personInstance.sayYourName()
+
+	if __name__ == "__main__":
+	  selfAndInitDemo()
+
+结果：
+	yeqing
+	global name
+
+--------------------------------------------
+为什么这种情况没有出现错误？
+其实是因为类中有name中这个变量，初始化类的时候就把它给初始化了。虽然没有输出我们想要的 yeqing 这个name，但是再后面的实例中，当在初始化中
+使用self.name 初始化后，就显示yeqing这个name覆盖了 class global name
+--------------------------------------------
+
+
+
