@@ -1,0 +1,3 @@
+Traceback (most recent call last):
+  File "tetris.py", line 42, in <module>
+AttributeError: 'Blackhole' object has no attribute 'writelines'

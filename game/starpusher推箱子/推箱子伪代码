@@ -1,0 +1,23 @@
+
+
+def main():
+	pygame.init()
+	DISPLAYSURF = pygame.display.set_mode((WINWIDTH, WINHEIGHT))
+	pygame.display.set_caption('Star Pusher')
+	BASICFONT = pygame.font.Font('freesansbold.ttf', 18)
+	startScreen() # show the title screen until the user presses a key
+	levels = readLevelsFile('starPusherLevels.txt')
+	currentLevelIndex = 0
+   
+    while 1:
+    	result = runLevel(levels, currentLevelIndex)
+		if result in ('solved', 'next'):
+           currentLevelIndex += 1
+		   if currentLevelIndex >= len(levels):
+               currentLevelIndex = 0
+        elif result == 'back':
+           currentLevelIndex -= 1
+		   if currentLevelIndex < 0:
+				currentLevelIndex = len(levels)-1
+	   elif result == 'reset':
+           pass # Do nothing. Loop re-calls runLevel() to reset the level
