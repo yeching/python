@@ -69,15 +69,15 @@ while running:
 		bullet[1]+=velx     
 		bullet[2]+=vely
 		if bullet[1]<-64 or bullet[1]>640 or bullet[2]<-64 or bullet[2]>480:
-			arrows.pop(index)#返回arrows中index位置的值，并把它从arrows中删除
+			arrows.pop(index)
 		index+=1
 		for projectile in arrows:
 			arrow1 = pygame.transform.rotate(arrow, 360-projectile[0]*57.29)
 			screen.blit(arrow1, (projectile[1], projectile[2]))
 	# 6.3 - Draw badgers
 	if badtimer==0:
-		badguys.append([640, random.randint(50,430)])#将所有敌人放在这个列表中
-		badtimer=100-(badtimer1*2)#能让敌人出现的越来越快，然后不变
+		badguys.append([640, random.randint(50,430)])
+		badtimer=100-(badtimer1*2)
 		if badtimer1>=35:
 			badtimer1=35
 		else:

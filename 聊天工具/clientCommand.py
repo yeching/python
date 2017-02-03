@@ -10,7 +10,7 @@ print 'clientSocket created'
 # connect the client to host
 clientsocket.connect((host,port))
 print 'clientSocket connect success'
-def clientthread()
+def clientthread():
 #loop
   while True:
 	data=clientsocket.recv(1024)
@@ -18,4 +18,3 @@ def clientthread()
 		break
 	print data
 clientsocket.close()
-serversocket.close()

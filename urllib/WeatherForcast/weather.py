@@ -1,8 +1,5 @@
 #coding=utf-8
-'''
-   这是一个查询天气的程序
-   来源corssin编程教室
-'''
+
 import city
 import urllib 
 import json
